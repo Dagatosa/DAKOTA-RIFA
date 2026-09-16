@@ -291,16 +291,13 @@
     <script>
         // Enlace de Google Apps Script integrado
         const API_URL = "https://script.google.com/macros/s/AKfycbzKIWMlalCQLwfgo1lVGF3amFVKPtk1TdmO9i6UTxeXz4u7hSlN8wDN528rShH3p2EfTw/exec";
-        
         let numeroActual = null;
 
-        // Iniciar al cargar la página
         document.addEventListener("DOMContentLoaded", () => {
             crearTablero();
             cargarOcupados();
         });
 
-        // 1. Crear cuadricula del 00 al 99
         function crearTablero() {
             const tablero = document.getElementById('tablero');
             for (let i = 0; i < 100; i++) {
@@ -314,7 +311,6 @@
             }
         }
 
-        // 2. Traer números reservados de Google Sheets
         function cargarOcupados() {
             fetch(API_URL)
                 .then(res => res.json())
@@ -324,7 +320,7 @@
                             let btn = document.getElementById('num-' + num);
                             if (btn) {
                                 btn.classList.add('reservado');
-                                btn.onclick = null; // Quita el evento click
+                                btn.onclick = null;
                             }
                         });
                     }
@@ -332,7 +328,6 @@
                 .catch(err => console.error("Error cargando números:", err));
         }
 
-        // 3. Control del Modal
         function abrirModal(numero) {
             let btn = document.getElementById('num-' + numero);
             if(btn.classList.contains('reservado')) return;
@@ -348,7 +343,6 @@
             numeroActual = null;
         }
 
-        // 4. Enviar datos al guardar
         document.getElementById('reserva-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -358,23 +352,17 @@
             btnSubmit.style.display = 'none';
             loading.style.display = 'block';
 
-            const datos = {
-                numero: numeroActual,
-                nombre: document.getElementById('nombre').value.trim(),
-                telefono: document.getElementById('telefono').value.trim()
-            };
+            const nombre = encodeURIComponent(document.getElementById('nombre').value.trim());
+            const telefono = encodeURIComponent(document.getElementById('telefono').value.trim());
 
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify(datos),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-            })
+            const urlConsulta = `${API_URL}?action=reservar&numero=${numeroActual}&nombre=${nombre}&telefono=${telefono}`;
+
+            fetch(urlConsulta)
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
                     alert('¡Gracias! El número ' + numeroActual + ' ha sido reservado para ayudar a Dakota 💙');
                     
-                    // Bloquear visualmente en pantalla inmediatamente
                     let btn = document.getElementById('num-' + numeroActual);
                     btn.classList.add('reservado');
                     btn.onclick = null;
@@ -385,7 +373,7 @@
                 }
             })
             .catch(err => {
-                alert('Ocurrió un error. Intenta nuevamente.');
+                alert('Ocurrió un error al conectar. Intenta nuevamente.');
             })
             .finally(() => {
                 btnSubmit.style.display = 'block';
