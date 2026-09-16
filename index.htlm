@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rifa Solidaria - Dakota</title>
+    <style>
+        :root {
+            --primario: #aaabe1;
+            --secundario: #b9eaff;
+            --texto: #0a070a;
+            --fondo: #fcfcfd;
+            --blanco: #ffffff;
+            --ocupado: #e0e0e0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--texto);
+        }
+
+        body {
+            background-color: var(--fondo);
+            padding: 20px;
+        }
+
+        .contenedor {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--blanco);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        /* Encabezado e Imagen */
+        .header {
+            text-align: center;
+        }
+
+        .imagen-dakota {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            background-color: var(--secundario);
+        }
+
+        .info-causa {
+            padding: 30px;
+            text-align: center;
+            background: var(--primario);
+            color: var(--texto);
+        }
+
+        .info-causa h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .info-causa p {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        /* Detalles del Sorteo */
+        .detalles-sorteo {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 20px 30px;
+            background: var(--secundario);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .detalle-card {
+            background: var(--blanco);
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+        }
+
+        .detalle-card span {
+            display: block;
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        /* Tablero de Números */
+        .tablero-container {
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .tablero-container h2 {
+            margin-bottom: 20px;
+            color: var(--primario);
+        }
+
+        .grid-numeros {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .numero {
+            background: var(--blanco);
+            border: 2px solid var(--primario);
+            border-radius: 10px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .numero:hover {
+            background: var(--secundario);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(185, 234, 255, 0.5);
+        }
+
+        .numero.reservado {
+            background: var(--ocupado);
+            border-color: #ccc;
+            color: #888;
+            cursor: not-allowed;
+            text-decoration: line-through;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal / Formulario */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 7, 10, 0.6);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: var(--blanco);
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal h3 {
+            color: var(--primario);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .modal span.num-destacado {
+            display: inline-block;
+            background: var(--secundario);
+            padding: 5px 15px;
+            border-radius: 10px;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primario);
+        }
+
+        .btn-confirmar {
+            width: 100%;
+            background: var(--primario);
+            color: var(--texto);
+            font-weight: bold;
+            font-size: 1.1rem;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: opacity 0.3s;
+        }
+
+        .btn-confirmar:hover {
+            opacity: 0.9;
+        }
+
+        .btn-cerrar {
+            background: none;
+            border: none;
+            color: #888;
+            margin-top: 15px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+        
+        #loading { display: none; margin-top: 10px; color: var(--primario); font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="contenedor">
+        <!-- Encabezado -->
+        <div class="header">
+            <!-- Imagen de Dakota integrada correctamente desde Google Drive -->
+            <img src="https://drive.google.com/uc?id=1OsF-a8ccwsApvp910PKfhX2x7vq2QnKJ" alt="Dakota" class="imagen-dakota">
+            
+            <div class="info-causa">
+                <h1>Rifa Solidaria</h1>
+                <p>Contribuye en esta hermosa causa para cubrir los medicamentos de Dakota 💙</p>
+            </div>
+        </div>
+
+        <!-- Detalles -->
+        <div class="detalles-sorteo">
+            <div class="detalle-card">
+                <span>Premio Mayor</span>
+                $500.000 COP
+            </div>
+            <div class="detalle-card">
+                <span>Valor de Boleta</span>
+                $15.000 COP
+            </div>
+            <div class="detalle-card">
+                <span>Sorteo y Lotería</span>
+                10 de octubre <br>Lotería de Boyacá
+            </div>
+        </div>
+
+        <!-- Tablero -->
+        <div class="tablero-container">
+            <h2>Selecciona tu número</h2>
+            <p>Haz clic en cualquier número disponible para apartarlo.</p>
+            <div class="grid-numeros" id="tablero">
+                <!-- Los números se generarán aquí con JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Formulario -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3>Estás reservando el número</h3>
+            <span class="num-destacado" id="num-seleccionado">--</span>
+            
+            <form id="reserva-form">
+                <div class="form-group">
+                    <label>Nombre completo:</label>
+                    <input type="text" id="nombre" required placeholder="Ej: María Pérez">
+                </div>
+                <div class="form-group">
+                    <label>Número de teléfono:</label>
+                    <input type="tel" id="telefono" required placeholder="Ej: 3001234567">
+                </div>
+                <button type="submit" class="btn-confirmar" id="btn-submit">Confirmar reserva</button>
+                <div id="loading">Registrando... Por favor espera.</div>
+                <button type="button" class="btn-cerrar" onclick="cerrarModal()">Cancelar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Enlace de Google Apps Script integrado
+        const API_URL = "https://script.google.com/macros/s/AKfycbzKIWMlalCQLwfgo1lVGF3amFVKPtk1TdmO9i6UTxeXz4u7hSlN8wDN528rShH3p2EfTw/exec";
+        
+        let numeroActual = null;
+
+        // Iniciar al cargar la página
+        document.addEventListener("DOMContentLoaded", () => {
+            crearTablero();
+            cargarOcupados();
+        });
+
+        // 1. Crear cuadricula del 00 al 99
+        function crearTablero() {
+            const tablero = document.getElementById('tablero');
+            for (let i = 0; i < 100; i++) {
+                let numStr = i < 10 ? '0' + i : i.toString();
+                let boton = document.createElement('div');
+                boton.className = 'numero';
+                boton.id = 'num-' + numStr;
+                boton.innerText = numStr;
+                boton.onclick = () => abrirModal(numStr);
+                tablero.appendChild(boton);
+            }
+        }
+
+        // 2. Traer números reservados de Google Sheets
+        function cargarOcupados() {
+            fetch(API_URL)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.ocupados) {
+                        data.ocupados.forEach(num => {
+                            let btn = document.getElementById('num-' + num);
+                            if (btn) {
+                                btn.classList.add('reservado');
+                                btn.onclick = null; // Quita el evento click
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error("Error cargando números:", err));
+        }
+
+        // 3. Control del Modal
+        function abrirModal(numero) {
+            let btn = document.getElementById('num-' + numero);
+            if(btn.classList.contains('reservado')) return;
+
+            numeroActual = numero;
+            document.getElementById('num-seleccionado').innerText = numero;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('modal').style.display = 'none';
+            document.getElementById('reserva-form').reset();
+            numeroActual = null;
+        }
+
+        // 4. Enviar datos al guardar
+        document.getElementById('reserva-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const btnSubmit = document.getElementById('btn-submit');
+            const loading = document.getElementById('loading');
+            
+            btnSubmit.style.display = 'none';
+            loading.style.display = 'block';
+
+            const datos = {
+                numero: numeroActual,
+                nombre: document.getElementById('nombre').value.trim(),
+                telefono: document.getElementById('telefono').value.trim()
+            };
+
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify(datos),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('¡Gracias! El número ' + numeroActual + ' ha sido reservado para ayudar a Dakota 💙');
+                    
+                    // Bloquear visualmente en pantalla inmediatamente
+                    let btn = document.getElementById('num-' + numeroActual);
+                    btn.classList.add('reservado');
+                    btn.onclick = null;
+                    
+                    cerrarModal();
+                } else {
+                    alert('Ups: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('Ocurrió un error. Intenta nuevamente.');
+            })
+            .finally(() => {
+                btnSubmit.style.display = 'block';
+                loading.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
